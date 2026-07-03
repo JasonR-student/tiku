@@ -22,6 +22,34 @@ export async function GET(request: NextRequest) {
     searchParams.get('pageSize')
   );
 
+  // 辅助：从本地JSON降级读取
+  const fallbackToJson = async (filterType: string, filterSearch: string, pg: number, ps: number, off: number) => {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const jsonPath = path.join(process.cwd(), 'cleaned_questions_final.json');
+    const raw = await fs.readFile(jsonPath, 'utf-8');
+    const allQuestions: Question[] = JSON.parse(raw);
+    
+    let filtered = allQuestions;
+    if (filterType && isValidType(filterType)) {
+      filtered = filtered.filter(q => q.type === filterType);
+    }
+    if (filterSearch) {
+      filtered = filtered.filter(q => 
+        q.title.includes(filterSearch) || (q.analysis || '').includes(filterSearch)
+      );
+    }
+
+    const filteredTotal = filtered.length;
+    const items = filtered.slice(off, off + ps);
+
+    return NextResponse.json({
+      success: true,
+      data: { items, total: filteredTotal, page: pg, pageSize: ps, totalPages: Math.ceil(filteredTotal / ps) },
+      degraded: true,
+    });
+  };
+
   try {
     // 构建查询条件
     const conditions: string[] = [];
@@ -48,6 +76,11 @@ export async function GET(request: NextRequest) {
     );
     const total = parseInt(countResult[0]?.count || '0', 10);
 
+    // DB连接成功但表为空 → 降级到本地JSON
+    if (total === 0) {
+      return fallbackToJson(type, search, page, pageSize, offset);
+    }
+
     // 查询分页数据
     const rows = await query<Question>(
       `SELECT * FROM questions ${whereClause} 
@@ -68,32 +101,8 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('[API] 查询题目失败，降级到本地JSON:', error);
-    // 降级：从本地JSON题库读取
     try {
-      const fs = await import('fs/promises');
-      const path = await import('path');
-      const jsonPath = path.join(process.cwd(), 'cleaned_questions_final.json');
-      const raw = await fs.readFile(jsonPath, 'utf-8');
-      const allQuestions: Question[] = JSON.parse(raw);
-      
-      let filtered = allQuestions;
-      if (type && isValidType(type)) {
-        filtered = filtered.filter(q => q.type === type);
-      }
-      if (search) {
-        filtered = filtered.filter(q => 
-          q.title.includes(search) || (q.analysis || '').includes(search)
-        );
-      }
-
-      const total = filtered.length;
-      const items = filtered.slice(offset, offset + pageSize);
-
-      return NextResponse.json({
-        success: true,
-        data: { items, total, page, pageSize, totalPages: Math.ceil(total / pageSize) },
-        degraded: true,
-      });
+      return fallbackToJson(type, search, page, pageSize, offset);
     } catch (fsError) {
       console.error('[API] 本地降级也失败:', fsError);
       return NextResponse.json(
