@@ -15,16 +15,15 @@ export default function HomePage() {
   const [typeCounts, setTypeCounts] = useState<Record<string,number>>({});
 
   useEffect(() => {
-    // 使用统计接口（单次聚合查询，高效）
-    fetch('/api/questions/stats')
+    // 直接从静态文件读取统计数据（零数据库依赖，构建时预计算，100%可靠）
+    fetch('/stats.json')
       .then(r => r.json())
       .then(d => {
-        if (d.success) {
-          setQuestionCount(d.data.total);
-          setTypeCounts(d.data.typeCounts || {});
-        }
+        setQuestionCount(d.total);
+        const { total, ...counts } = d;
+        setTypeCounts(counts);
       })
-      .catch((err) => { console.error('[Home] 统计接口请求失败:', err); });
+      .catch((err) => { console.error('[Home] 统计数据加载失败:', err); });
   }, []);
 
   const todayDone = progress.todayCompleted || 0;
