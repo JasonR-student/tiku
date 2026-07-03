@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Neural Grid - 科技风思政题库刷题系统
+   深空黑 + 电光青 + 扫描网格动效
+============================================ */
+
+@layer base {
+  :root {
+    --neon-cyan: #00e5ff;
+    --neon-purple: #8b5cf6;
+    --neon-green: #00ff88;
+    --neon-red: #ff3d5c;
+    --neon-amber: #ffb300;
+    --bg-deep: #060b14;
+    --bg-panel: #0d1525;
+    --bg-card: #111827;
+    --border-subtle: #1e293b;
+    --text-main: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-deep);
+    color: var(--text-main);
+    font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* 扫描线网格背景 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.015) 2px, rgba(0,229,255,0.015) 4px),
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 100% 4px, 60px 60px, 60px 60px;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(0,229,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+@layer components {
+  /* 赛博卡片 */
+  .cyber-card {
+    @apply relative rounded-xl overflow-hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 0 20px rgba(0,229,255,0.05), inset 0 1px 0 rgba(255,255,255,0.02);
+    transition: all 0.3s ease;
+  }
+  .cyber-card:hover {
+    border-color: rgba(0,229,255,0.25);
+    box-shadow: 0 0 30px rgba(0,229,255,0.1), 0 0 60px rgba(0,229,255,0.03);
+  }
+  .cyber-card-body { @apply p-4 sm:p-6; }
+
+  /* 按钮 */
+  .btn-cyber {
+    @apply relative inline-flex items-center justify-center font-semibold px-5 py-2.5 rounded-lg text-sm tracking-wide transition-all duration-300 cursor-pointer border-0;
+    background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(139,92,246,0.2));
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0,229,255,0.4);
+    box-shadow: 0 0 15px rgba(0,229,255,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .btn-cyber:hover {
+    background: linear-gradient(135deg, rgba(0,229,255,0.3), rgba(139,92,246,0.3));
+    box-shadow: 0 0 25px rgba(0,229,255,0.25), 0 0 50px rgba(0,229,255,0.05);
+    transform: translateY(-1px);
+  }
+  .btn-cyber:active { transform: translateY(0); }
+  .btn-cyber:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-ghost-cyber {
+    @apply px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer;
+    color: var(--text-dim); border: 1px solid var(--border-subtle); background: transparent;
+  }
+  .btn-ghost-cyber:hover {
+    color: var(--neon-cyan); border-color: rgba(0,229,255,0.3);
+    background: rgba(0,229,255,0.05);
+  }
+
+  .btn-danger-cyber {
+    @apply px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer border-0;
+    background: rgba(255,61,92,0.15); color: var(--neon-red);
+    box-shadow: 0 0 15px rgba(255,61,92,0.1);
+  }
+  .btn-danger-cyber:hover { background: rgba(255,61,92,0.25); box-shadow: 0 0 20px rgba(255,61,92,0.2); }
+
+  /* 选项按钮 */
+  .option-cyber {
+    @apply w-full text-left px-4 py-3 rounded-lg mb-2.5 transition-all duration-200 cursor-pointer relative;
+    background: rgba(17,24,39,0.8); border: 1px solid var(--border-subtle); color: var(--text-main);
+  }
+  .option-cyber:hover { border-color: rgba(0,229,255,0.35); background: rgba(0,229,255,0.05); box-shadow: 0 0 15px rgba(0,229,255,0.08); }
+  .option-cyber-selected { border-color: var(--neon-cyan) !important; background: rgba(0,229,255,0.1) !important; box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.03) !important; }
+  .option-cyber-correct { border-color: var(--neon-green) !important; background: rgba(0,255,136,0.08) !important; box-shadow: 0 0 15px rgba(0,255,136,0.1) !important; cursor: default; }
+  .option-cyber-wrong { border-color: var(--neon-red) !important; background: rgba(255,61,92,0.08) !important; box-shadow: 0 0 15px rgba(255,61,92,0.1) !important; cursor: default; }
+
+  /* 标签 */
+  .cyber-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold tracking-wider uppercase border;
+  }
+  .cyber-badge-single { color: var(--neon-cyan); border-color: rgba(0,229,255,0.3); background: rgba(0,229,255,0.08); }
+  .cyber-badge-multiple { color: var(--neon-purple); border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.08); }
+  .cyber-badge-judge { color: var(--neon-amber); border-color: rgba(255,179,0,0.3); background: rgba(255,179,0,0.08); }
+  .cyber-badge-essay { color: var(--neon-green); border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.08); }
+
+  /* 进度条 */
+  .neon-progress {
+    @apply w-full h-1.5 rounded-full overflow-hidden;
+    background: rgba(30,41,59,0.8); box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .neon-progress-bar {
+    @apply h-full rounded-full transition-all duration-500;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+    box-shadow: 0 0 10px rgba(0,229,255,0.3);
+  }
+
+  /* 开关 */
+  .neon-switch {
+    @apply relative w-11 h-6 rounded-full transition-all duration-300 cursor-pointer;
+    background: rgba(30,41,59,0.8); border: 1px solid var(--border-subtle);
+  }
+  .neon-switch-on { background: rgba(0,229,255,0.2) !important; border-color: rgba(0,229,255,0.5) !important; box-shadow: 0 0 10px rgba(0,229,255,0.2); }
+
+  /* 分析面板 */
+  .analysis-panel {
+    @apply p-4 rounded-lg mt-3 text-sm border;
+    background: rgba(17,24,39,0.6); border-color: var(--border-subtle);
+  }
+  .analysis-panel-ai { border-color: rgba(0,229,255,0.2); background: rgba(0,229,255,0.03); }
+
+  /* 分页点 */
+  .page-dot {
+    @apply w-7 h-7 rounded text-xs font-mono font-medium transition-all duration-200 flex items-center justify-center cursor-pointer;
+    background: rgba(17,24,39,0.8); border: 1px solid var(--border-subtle); color: var(--text-dim);
+  }
+  .page-dot-active { background: rgba(0,229,255,0.15) !important; border-color: var(--neon-cyan) !important; color: var(--neon-cyan) !important; box-shadow: 0 0 10px rgba(0,229,255,0.2); }
+  .page-dot:hover:not(.page-dot-active) { border-color: rgba(0,229,255,0.3); color: var(--text-main); }
+
+  /* 底部导航 */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 flex justify-around items-center py-2 px-4 z-50;
+    background: rgba(6,11,20,0.95); border-top: 1px solid var(--border-subtle);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.2); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,229,255,0.4); }
+
+/* 骨架屏 */
+.skeleton-cyber {
+  background: linear-gradient(90deg, rgba(17,24,39,0.8) 25%, rgba(30,41,59,0.6) 50%, rgba(17,24,39,0.8) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* 脉冲 */
+@keyframes pulse-neon { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+.pulse-neon { animation: pulse-neon 2s infinite; }
+
+/* 发光 */
+.glow-cyan { text-shadow: 0 0 10px rgba(0,229,255,0.5), 0 0 30px rgba(0,229,255,0.2); }
+.glow-green { text-shadow: 0 0 10px rgba(0,255,136,0.5), 0 0 30px rgba(0,255,136,0.2); }
+.glow-red { text-shadow: 0 0 10px rgba(255,61,92,0.5), 0 0 30px rgba(255,61,92,0.2); }
+
+/* 数字读码器 */
+.data-readout { @apply font-mono text-lg font-bold tracking-wider; color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,229,255,0.4); }
