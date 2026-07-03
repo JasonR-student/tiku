@@ -7,7 +7,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/app/providers';
-import { Question, QuestionType } from '@/lib/types';
+import { Question, QuestionType, QuestionTypeLabels } from '@/lib/types';
 import { shuffle, isAnswerCorrect, splitMergedOptions, getDisplayAnswer, TYPE_BADGE_CLASS, TYPE_LABEL } from '@/lib/quiz-utils';
 
 // ---- 内联QuizCard（强制乱序 + 答案文本比对） ----

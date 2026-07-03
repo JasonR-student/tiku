@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
+// 强制动态渲染（数据库查询不能静态预渲染）
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/questions/stats - 获取题库统计
  * 返回：总题数 + 各题型数量分布
